@@ -1,8 +1,10 @@
 import { useState } from "react";
 
-function SimpleList({ el, id, name, deleteItem }) {
+function SimpleList({ el, deleteItem, index }) {
+    const [id, setId] =  useState(Object.keys(el)[0])
+    const [name, setName] = useState(el[id])
     return <div>
-        <input readOnly value={el[id]} />
+        {`${index+1})`} <input readOnly value={name} />
         <button id={id} onClick={deleteItem}>Delete</button>
     </div>
 }

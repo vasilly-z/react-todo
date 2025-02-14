@@ -5,34 +5,35 @@ import SimpleList from "./simpleList";
 function SimpleTodo({ name }) {
     const [state, setState] = useState([])
     const [text, setText] = useState('')
-    const [storageLength, setStorageLength] = useState(Object.keys(localStorage).sort().pop())
     const [last, setLast] = useState(0)
+
     useEffect(() => {
-        if (storageLength) {
-            setLast(storageLength)
-        } 
         let tempArray = []
-        const oKeys = Object.keys(localStorage).sort()
-        for (let key of oKeys) {
-            const name = localStorage.getItem(key)
-            const item = { [key]: name }
-            tempArray.push(item)
+        const oKeys = Object.keys(localStorage).sort((a,b) => +a - +b)
+        console.log(oKeys)
+        if (oKeys.length > 0) {
+            setLast((+oKeys[oKeys.length -1 ]))
+            for (let key of oKeys) {
+                const name = localStorage.getItem(key)
+                const item = { [key]: name }
+                tempArray.push(item)
+                setState(tempArray)
+            }
         }
-        setState(tempArray)
-        console.log(localStorage, state, storageLength, last)
-        
+        console.log( last)
     }, [])
 
     function addTodo() {
-        setState(() => [...state, {[+last+1] : text}])
-        localStorage.setItem(+last+1, text)
-        // setTimeout(() => {
-        //     setText('')
-        // }, 150)
+        setLast((prev) => prev+1)
+        localStorage.setItem(last+1, text)
+         setState(() => [...state, { [last+1]: text }])
+         setTimeout(() => {
+            setText('')
+        }, 150)
 
     }
     const handleChange = (e) => {
-        const { value } = e.target
+        const { value } = e.target;
         setText(value)
     }
     function clear() {
@@ -40,18 +41,17 @@ function SimpleTodo({ name }) {
         setState([])
     }
     const deleteItem = (e) => {
-        const { id } = e.target 
-        console.log(id)
-        // setState((prev) => prev.filter((_, i) => i != id))
-        localStorage.removeItem(+id-1)
+        const { id } = e.target
+        setState((prev) => (prev.filter((el) => (Object.keys(el)[0] != id))))          
+        localStorage.removeItem(+id)
     }
     return <div>
         <div className="todosList"></div>
         <input value={text} onChange={handleChange} type="text" />
         <button onClick={addTodo}>{name}</button>
         <button onClick={clear}>clear</button>
-        {state.map((el, id) => <SimpleList key={id+1} id={id+1} name={el[id+1]}
-            el={el} deleteItem={deleteItem} />)}
+        {state.map((el, index) => <SimpleList key={Object.keys(el)[0]}
+           index={index} el={el} deleteItem={deleteItem} />)}
       </div>
 }
 
